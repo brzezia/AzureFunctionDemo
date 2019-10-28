@@ -26,12 +26,21 @@ namespace AzureFunctionDemo
         [FunctionName("CosmosDemoReceiver")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+            [CosmosDB(
+
+                databaseName: "democardb",
+                collectionName: "cars",
+                CreateIfNotExists = true,
+                ConnectionStringSetting = "CosmosDBconnString")
+            ] IAsyncCollector<Car> storage,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
 
-            var Car = await _converter.ReadFromBody<Car>(req);
+            var car = await _converter.ReadFromBody<Car>(req);
+            car.Id = Guid.NewGuid();
+            await storage.AddAsync(car);
 
             return (ActionResult)new OkObjectResult($"Ok");
         
