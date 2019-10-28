@@ -11,6 +11,9 @@ using AzureFunctionDemo;
 using Microsoft.Azure.WebJobs.Hosting;
 using AzureFunctionDemo.Model;
 using AzureFunctionDemo.Mappers;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
+using System.Linq;
 
 [assembly: WebJobsStartup(typeof(Startup))]
 namespace AzureFunctionDemo
@@ -26,14 +29,26 @@ namespace AzureFunctionDemo
         [FunctionName("CosmosDemoReader")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+            [CosmosDB(
+
+                databaseName: "democardb",
+                collectionName: "cars",
+                ConnectionStringSetting = "CosmosDBconnString")
+            ] DocumentClient  documentClient,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
+            var collectionUri = UriFactory.CreateDocumentCollectionUri("democardb", "cars");
+            var id =  _converter.ReadIdFromQuery(req);
 
-            var id =  _converter.ReadFromQuery(req,"id");
+            var query = documentClient.CreateDocumentQuery<Car>(collectionUri);
+            var result2 = await query.Where(x => x.Id == id).AsDocumentQuery().ExecuteNextAsync<Car>();
 
-            return (ActionResult)new OkObjectResult($"{id}");
+
+            //var result = query.Select(x=>x);  also works
+
+            return (ActionResult)new OkObjectResult(result2);
 
         }
     }

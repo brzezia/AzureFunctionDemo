@@ -18,6 +18,7 @@ namespace AzureFunctionDemo.Mappers
     {
         Task<T> ReadFromBody<T>(HttpRequest req);
         string ReadFromQuery(HttpRequest req, string name);
+        Guid ReadIdFromQuery(HttpRequest req, string idName = "id");
     }
 
     public class Converter : IConverter
@@ -33,6 +34,14 @@ namespace AzureFunctionDemo.Mappers
         {
             var queries = req.Query.TryGetValue(name, out var value);
             return value;
+        }
+        public Guid ReadIdFromQuery(HttpRequest req, string idName = "id")
+        {
+            var queries = req.Query.TryGetValue("id", out var value);
+
+            Guid.TryParse(value, out var result);
+
+            return result;
         }
     }
 }
