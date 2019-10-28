@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -15,26 +15,26 @@ using AzureFunctionDemo.Mappers;
 [assembly: WebJobsStartup(typeof(Startup))]
 namespace AzureFunctionDemo
 {
-    public class CosmosDemoReceiver
+    public class CosmosDemoReader
     {
         private readonly IConverter _converter;
-        public CosmosDemoReceiver(IConverter converter)
+        public CosmosDemoReader(IConverter converter)
         {
             _converter = converter;
         }
 
-        [FunctionName("CosmosDemoReceiver")]
+        [FunctionName("CosmosDemoReader")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
 
-            var Car = await _converter.ReadFromBody<Car>(req);
+            var id =  _converter.ReadFromQuery(req,"id");
 
-            return (ActionResult)new OkObjectResult($"Ok");
-        
+            return (ActionResult)new OkObjectResult($"{id}");
+
         }
     }
 }
