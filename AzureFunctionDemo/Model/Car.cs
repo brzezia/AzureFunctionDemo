@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace AzureFunctionDemo.Model
 {
-    public class Car
+    public class Car : IEntity
     {
         [JsonProperty(PropertyName = "id")]
         public Guid Id { get; set; }

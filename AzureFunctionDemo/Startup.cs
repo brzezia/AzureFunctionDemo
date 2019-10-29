@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define customEventSender
+using System;
 using AzureFunctionDemo.AzureGrid;
 using AzureFunctionDemo.Mappers;
 using AzureFunctionDemo.Model;
@@ -29,9 +30,17 @@ namespace AzureFunctionDemo
                 x.TopicHostName = Environment.GetEnvironmentVariable("topichostname");
                 x.Subject = Environment.GetEnvironmentVariable("subject");
             });
-            
-          
-            builder.Services.AddScoped(typeof(IEventGridSender<>), typeof(EventGridSender<>));
+#if (customEventSender)
+
+            builder.Services.AddHttpClient("event-sender");
+            builder.Services.AddScoped(typeof(IEventGridSender<>), typeof(CustomEventGridSender<>));
+
+#else
+#endif
+            // builder.Services.AddScoped(typeof(IEventGridSender<>), typeof(EventGridSender<>));
+
+            // use customEventGridSender
+
             builder.Services.AddScoped<IConverter, Converter>();
             builder.Services.AddLogging(b => b.AddSerilog(dispose: true));
 

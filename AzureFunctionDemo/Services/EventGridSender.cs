@@ -11,25 +11,24 @@ namespace AzureFunctionDemo.AzureGrid
 {
     public interface IEventGridSender<T>
     {
-        Task<bool> SendAsync(Car car);
+        Task<bool> SendAsync(T car);
     }
 
-    public class EventGridSender<T> : IEventGridSender<T>
+    public class EventGridSender<T> : IEventGridSender<T> where T: IEntity
     {
         private readonly EventGridConfig _options;
         public EventGridSender(IOptions<EventGridConfig> options)
         {
             _options = options.Value;
         }
-        public async Task<bool> SendAsync(Car car)
+        public async Task<bool> SendAsync(T entity)
         {
             var topicKey = _options.TopicKey;
             var credentials = new TopicCredentials(topicKey);
 
             var client = new EventGridClient(credentials);
 
-
-            var events =  CreateEvent(car);
+            var events =  CreateEvent(entity);
 
            var response = await client.PublishEventsWithHttpMessagesAsync(
                 topicHostname: _options.TopicHostName,
@@ -39,15 +38,15 @@ namespace AzureFunctionDemo.AzureGrid
             return response.Response.IsSuccessStatusCode;
         }
 
-        private IList<EventGridEvent> CreateEvent(Car car)
+        private IList<EventGridEvent> CreateEvent(T entity)
         {
 
             return new List<EventGridEvent>
             {
               new EventGridEvent
               {
-                  Id = car.Id.ToString("N"),
-                  Data = car,
+                  Id = entity.Id.ToString("N"),
+                  Data = entity,
                   DataVersion = "1",
                   EventTime = DateTime.Now,
                   EventType = "CarCreated",
