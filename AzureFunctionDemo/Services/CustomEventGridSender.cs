@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using AzureFunctionDemo.AzureGrid;
 using EventJson;
 using AzureFunctionDemo.Model;
+using AzureFunctionDemo.Helper;
 
 namespace AzureFunctionDemo.AzureGrid
 {
@@ -31,7 +32,7 @@ namespace AzureFunctionDemo.AzureGrid
             var client = _clientFactory.CreateClient("event-sender");
 
             var eventOutput = new EventComposer<T>()
-                .ComposeEvent(data, "Car_Event", _configuration.Subject);
+                .ComposeEvent(data, $"{typeof(T).Name}_Event", /* _configuration.Subject*/ DataGenerator.GenerateName(8));
 
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
