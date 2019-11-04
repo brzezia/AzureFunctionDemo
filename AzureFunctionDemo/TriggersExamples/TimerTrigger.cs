@@ -8,15 +8,15 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureFunctionDemo.TimerTriggerAf
 {
-    public  class TimerTrigDemo
+    public  class TimerTrigger
     {
         private readonly IEventGridSender<Bike> _eventGridSender;
-        public TimerTrigDemo(IEventGridSender<Bike> eventGridSender)
+        public TimerTrigger(IEventGridSender<Bike> eventGridSender)
         {
             _eventGridSender = eventGridSender;
         }
         [FunctionName("TimerTrigDemo")]
-        public  void Run([TimerTrigger("*/30 * * * * *")]TimerInfo myTimer, ILogger log)
+        public  void Run([TimerTrigger("*/600 * * * * *")]TimerInfo myTimer, ILogger log)
         {
 
 
