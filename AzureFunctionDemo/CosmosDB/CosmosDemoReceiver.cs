@@ -39,10 +39,14 @@ namespace AzureFunctionDemo
 
 
             var car = await _converter.ReadFromBody<Car>(req);
-            car.Id = Guid.NewGuid();
-            await storage.AddAsync(car);
+            if (car != null)
+            {
+                car.Id = Guid.NewGuid();
+                await storage.AddAsync(car);
+                return  new OkObjectResult($"Ok");
+            }
 
-            return (ActionResult)new OkObjectResult($"Ok");
+            return new BadRequestResult();
         
         }
     }
